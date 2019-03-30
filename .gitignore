@@ -344,3 +344,6 @@ healthchecksdb
 MigrationBackup/
 
 *.cache
+/*
+/obj
+/bin
