@@ -69,7 +69,7 @@ namespace NPOIdemo
 
             var strFilePath = "template.xlt";
             HSSFWorkbook workbook;
-            using (var fs = new FileStream(strFilePath, FileMode.Open, FileAccess.ReadWrite))
+            using ( var fs = new FileStream(strFilePath, FileMode.Open, FileAccess.ReadWrite))
             {
                 workbook = new HSSFWorkbook(fs);
                 fs.Close();
