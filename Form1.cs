@@ -1,26 +1,24 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
+using System.Diagnostics;
+using System.IO;
 using System.Windows.Forms;
 using NPOI.HSSF.UserModel;
-using System.IO;
 using NPOI.SS.UserModel;
 
 namespace NPOIdemo
 {
     public partial class Form1 : Form
     {
+        private DataTable ProductInfo;
+
         public Form1()
         {
             InitializeComponent();
         }
-        private DataTable ProductInfo;
-        private void createDataTable() {
 
+        private void createDataTable()
+        {
             ProductInfo = new DataTable();
 
             ProductInfo.Clear();
@@ -28,7 +26,7 @@ namespace NPOIdemo
             ProductInfo.Columns.Add("_WH");
             ProductInfo.Columns.Add("_Qty");
 
-            DataRow ProductRow = ProductInfo.NewRow();
+            var ProductRow = ProductInfo.NewRow();
             ProductRow["_Product"] = "AS133";
             ProductRow["_WH"] = "W101";
             ProductRow["_Qty"] = "10";
@@ -64,13 +62,14 @@ namespace NPOIdemo
             ProductRow["_Qty"] = "8";
             ProductInfo.Rows.Add(ProductRow);
         }
+
         private void button1_Click(object sender, EventArgs e)
         {
             createDataTable();
 
-            string strFilePath = string.Format("template.xlt");
+            var strFilePath = "template.xlt";
             HSSFWorkbook workbook;
-            using (FileStream fs = new FileStream(strFilePath, FileMode.Open, FileAccess.ReadWrite))
+            using (var fs = new FileStream(strFilePath, FileMode.Open, FileAccess.ReadWrite))
             {
                 workbook = new HSSFWorkbook(fs);
                 fs.Close();
@@ -79,26 +78,24 @@ namespace NPOIdemo
             if (workbook != null)
             {
                 //load template
-                HSSFSheet RawData = (HSSFSheet)workbook.GetSheet("RawData");
+                var RawData = (HSSFSheet) workbook.GetSheet("RawData");
 
                 //data to newSheet 
-                HSSFCell hc;
-                HSSFRow hr;
-                HSSFSheet hst = RawData;
+                var hst = RawData;
 
-                for (int i = 0; i < ProductInfo.Rows.Count; i++)
+                for (var i = 0; i < ProductInfo.Rows.Count; i++)
                 {
-                    hr = (HSSFRow)hst.CreateRow(i + 1);
-                    for (int j = 0; j < ProductInfo.Columns.Count; j++)
+                    var hr = (HSSFRow) hst.CreateRow(i + 1);
+                    for (var j = 0; j < ProductInfo.Columns.Count; j++)
                     {
-                        hc = (HSSFCell)hr.CreateCell(j);
+                        var hc = (HSSFCell) hr.CreateCell(j);
                         //Notice!!! Qty is Int,other String.
                         if (ProductInfo.Columns[j].Caption == "_Qty")
                         {
                             hc.SetCellType(CellType.Numeric);
                             if (!string.IsNullOrEmpty(ProductInfo.Rows[i][j].ToString()))
                             {
-                                int number = Convert.ToInt32(ProductInfo.Rows[i][j].ToString());
+                                var number = Convert.ToInt32(ProductInfo.Rows[i][j].ToString());
                                 hc.SetCellValue(number);
                             }
                             else
@@ -114,8 +111,8 @@ namespace NPOIdemo
                 }
 
                 //export new EXCEL file
-                String filename = "P_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".xls";
-                FileStream fsExcelNew = new FileStream(filename, FileMode.Create);
+                var filename = "P_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".xls";
+                var fsExcelNew = new FileStream(filename, FileMode.Create);
                 workbook.Write(fsExcelNew);
 
                 //remove sheet
@@ -126,8 +123,8 @@ namespace NPOIdemo
 
                 //Open excel
                 //System.Windows.Forms.Application.StartupPath + "\\" + filename;
-                 string file = @"C:\Windows\explorer.exe";
-                 System.Diagnostics.Process.Start(file, filename);
+                var file = @"C:\Windows\explorer.exe";
+                Process.Start(file, filename);
             }
         }
     }
